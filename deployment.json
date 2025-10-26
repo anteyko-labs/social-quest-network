@@ -1,0 +1,7 @@
+{
+  "network": "statusSepolia",
+  "rewardToken": "0x7cF63006E9108CCeba3dFD60316aE49206e03A6F",
+  "socialQuestNetwork": "0x172EF1b0185273112b331637b67bFF523F7239bA",
+  "deployedAt": "2025-10-26T03:53:30.923Z",
+  "gasless": true
+}

@@ -42,9 +42,10 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
   [publicProvider()]
 )
 
+// Use RainbowKit's default wallets
 const { connectors } = getDefaultWallets({
   appName: 'Social Quest Network',
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'your-project-id',
+  projectId: 'demo-project-id',
   chains,
 })
 

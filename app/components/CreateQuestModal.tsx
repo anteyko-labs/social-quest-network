@@ -11,16 +11,19 @@ interface CreateQuestModalProps {
 export function CreateQuestModal({ onClose, onSubmit }: CreateQuestModalProps) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [reward, setReward] = useState(100)
+  const [reward, setReward] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!title.trim() || !description.trim()) return
+    if (!title.trim() || !description.trim() || !reward.trim()) return
+    
+    const rewardNumber = Number(reward)
+    if (isNaN(rewardNumber) || rewardNumber <= 0) return
     
     setIsSubmitting(true)
     try {
-      await onSubmit(title, description, reward)
+      await onSubmit(title, description, rewardNumber)
     } finally {
       setIsSubmitting(false)
     }
@@ -85,7 +88,8 @@ export function CreateQuestModal({ onClose, onSubmit }: CreateQuestModalProps) {
               <input
                 type="number"
                 value={reward}
-                onChange={(e) => setReward(Number(e.target.value))}
+                onChange={(e) => setReward(e.target.value)}
+                placeholder="Enter reward amount"
                 min="1"
                 max="10000"
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -122,7 +126,7 @@ export function CreateQuestModal({ onClose, onSubmit }: CreateQuestModalProps) {
             </button>
             <button
               type="submit"
-              disabled={isSubmitting || !title.trim() || !description.trim()}
+              disabled={isSubmitting || !title.trim() || !description.trim() || !reward.trim()}
               className="flex-1 quest-button disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (

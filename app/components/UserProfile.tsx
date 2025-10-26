@@ -1,22 +1,66 @@
 'use client'
 
+import React from 'react'
 import { Trophy, Star, Coins, Users, Award } from 'lucide-react'
 import { ClientOnly } from './ClientOnly'
+import { useAccount, useContractRead } from 'wagmi'
 
 interface UserProfileProps {
   address?: string
+  refreshTrigger?: number
 }
 
-export function UserProfile({ address }: UserProfileProps) {
-  // Mock data - in real app this would come from contract
-  const profile = {
-    reputation: 1250,
-    questsCreated: 12,
-    questsCompleted: 8,
-    totalRewardsEarned: 2400,
-    isVerified: true,
-    rank: 'Gold',
-    level: 5
+// Contract ABI for user profile
+const USER_PROFILE_ABI = [
+  {
+    "inputs": [{"internalType": "address", "name": "_user", "type": "address"}],
+    "name": "getUserProfile",
+    "outputs": [
+      {"internalType": "uint256", "name": "reputation", "type": "uint256"},
+      {"internalType": "uint256", "name": "questsCreated", "type": "uint256"},
+      {"internalType": "uint256", "name": "questsCompleted", "type": "uint256"},
+      {"internalType": "uint256", "name": "totalRewardsEarned", "type": "uint256"},
+      {"internalType": "bool", "name": "isVerified", "type": "bool"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
+
+export function UserProfile({ address, refreshTrigger }: UserProfileProps) {
+  // Get user profile from contract
+  const { data: profileData, refetch } = useContractRead({
+    address: '0x172EF1b0185273112b331637b67bFF523F7239bA' as `0x${string}`,
+    abi: USER_PROFILE_ABI,
+    functionName: 'getUserProfile',
+    args: address ? [address] : undefined,
+    enabled: !!address,
+  })
+
+  // Refetch when refreshTrigger changes
+  React.useEffect(() => {
+    if (refreshTrigger && address) {
+      refetch()
+    }
+  }, [refreshTrigger, address, refetch])
+
+  // Use contract data or fallback to mock data
+  const profile = profileData ? {
+    reputation: Number(profileData[0]),
+    questsCreated: Number(profileData[1]),
+    questsCompleted: Number(profileData[2]),
+    totalRewardsEarned: Number(profileData[3]),
+    isVerified: profileData[4],
+    rank: Number(profileData[0]) >= 1000 ? 'Gold' : Number(profileData[0]) >= 500 ? 'Silver' : 'Bronze',
+    level: Math.floor(Number(profileData[0]) / 200) + 1
+  } : {
+    reputation: 0,
+    questsCreated: 0,
+    questsCompleted: 0,
+    totalRewardsEarned: 0,
+    isVerified: false,
+    rank: 'Bronze',
+    level: 1
   }
   
   const getReputationBadge = (reputation: number) => {

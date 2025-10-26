@@ -1,34 +1,76 @@
 'use client'
 
+import React from 'react'
 import { Trophy, Users, Zap, Coins } from 'lucide-react'
+import { useContractRead } from 'wagmi'
 
-export function Stats() {
+// Contract ABI for platform stats
+const PLATFORM_STATS_ABI = [
+  {
+    "inputs": [],
+    "name": "getPlatformStats",
+    "outputs": [
+      {"internalType": "uint256", "name": "totalQuestsCreated", "type": "uint256"},
+      {"internalType": "uint256", "name": "totalQuestsCompleted", "type": "uint256"},
+      {"internalType": "uint256", "name": "totalActiveUsers", "type": "uint256"},
+      {"internalType": "uint256", "name": "totalRewardsDistributed", "type": "uint256"}
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
+
+interface StatsProps {
+  refreshTrigger?: number
+}
+
+export function Stats({ refreshTrigger }: StatsProps) {
+  // Get platform stats from contract
+  const { data: statsData, refetch } = useContractRead({
+    address: '0x172EF1b0185273112b331637b67bFF523F7239bA' as `0x${string}`,
+    abi: PLATFORM_STATS_ABI,
+    functionName: 'getPlatformStats',
+  })
+
+  // Refetch when refreshTrigger changes
+  React.useEffect(() => {
+    if (refreshTrigger) {
+      refetch()
+    }
+  }, [refreshTrigger, refetch])
+
+  // Use contract data or fallback to default values
+  const totalQuestsCreated = statsData ? Number(statsData[0]) : 0
+  const totalQuestsCompleted = statsData ? Number(statsData[1]) : 0
+  const totalActiveUsers = statsData ? Number(statsData[2]) : 0
+  const totalRewardsDistributed = statsData ? Number(statsData[3]) : 0
+
   const stats = [
     {
       icon: Trophy,
       label: 'Quests Created',
-      value: '1,234',
+      value: totalQuestsCreated.toLocaleString(),
       color: 'text-blue-600',
       bgColor: 'bg-blue-100'
     },
     {
       icon: Users,
       label: 'Active Users',
-      value: '567',
+      value: totalActiveUsers.toLocaleString(),
       color: 'text-green-600',
       bgColor: 'bg-green-100'
     },
     {
       icon: Zap,
       label: 'Gasless Transactions',
-      value: '10,000+',
+      value: (totalQuestsCreated + totalQuestsCompleted).toLocaleString() + '+',
       color: 'text-purple-600',
       bgColor: 'bg-purple-100'
     },
     {
       icon: Coins,
       label: 'Rewards Distributed',
-      value: '50,000 QRT',
+      value: totalRewardsDistributed.toLocaleString() + ' QRT',
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-100'
     }

@@ -19,6 +19,8 @@ contract SocialQuestNetwork is ERC721, Ownable, ReentrancyGuard {
         address completer;
         uint256 createdAt;
         uint256 completedAt;
+        string proofOfCompletion; // URL or hash of proof
+        bool requiresProof; // Whether quest requires proof of completion
     }
 
     // User reputation system
@@ -54,7 +56,8 @@ contract SocialQuestNetwork is ERC721, Ownable, ReentrancyGuard {
     function createQuest(
         string memory _title,
         string memory _description,
-        uint256 _reward
+        uint256 _reward,
+        bool _requiresProof
     ) external returns (uint256) {
         require(bytes(_title).length > 0, "Title cannot be empty");
         require(bytes(_description).length > 0, "Description cannot be empty");
@@ -71,7 +74,9 @@ contract SocialQuestNetwork is ERC721, Ownable, ReentrancyGuard {
             isCompleted: false,
             completer: address(0),
             createdAt: block.timestamp,
-            completedAt: 0
+            completedAt: 0,
+            proofOfCompletion: "",
+            requiresProof: _requiresProof
         });
 
         userQuests[msg.sender].push(questId);
@@ -85,16 +90,23 @@ contract SocialQuestNetwork is ERC721, Ownable, ReentrancyGuard {
     /**
      * @dev Complete a quest (GASLESS transaction)
      */
-    function completeQuest(uint256 _questId) external nonReentrant {
+    function completeQuest(uint256 _questId, string memory _proofOfCompletion) external nonReentrant {
         Quest storage quest = quests[_questId];
         require(quest.isActive, "Quest is not active");
         require(!quest.isCompleted, "Quest already completed");
         require(quest.creator != msg.sender, "Cannot complete your own quest");
+        
+        // If quest requires proof, validate it
+        if (quest.requiresProof) {
+            require(bytes(_proofOfCompletion).length > 0, "Proof of completion is required");
+            require(bytes(_proofOfCompletion).length >= 10, "Proof must be at least 10 characters");
+        }
 
         quest.isCompleted = true;
         quest.completer = msg.sender;
         quest.completedAt = block.timestamp;
         quest.isActive = false;
+        quest.proofOfCompletion = _proofOfCompletion;
 
         // Update user profiles
         userProfiles[msg.sender].questsCompleted++;
@@ -113,12 +125,6 @@ contract SocialQuestNetwork is ERC721, Ownable, ReentrancyGuard {
         emit ReputationUpdated(msg.sender, userProfiles[msg.sender].reputation);
     }
 
-    /**
-     * @dev Get user profile
-     */
-    function getUserProfile(address _user) external view returns (UserProfile memory) {
-        return userProfiles[_user];
-    }
 
     /**
      * @dev Get quest details
@@ -165,15 +171,58 @@ contract SocialQuestNetwork is ERC721, Ownable, ReentrancyGuard {
     }
 
     /**
+     * @dev Get quest details by ID
+     */
+    function getQuestDetails(uint256 _questId) external view returns (
+        uint256 id,
+        address creator,
+        string memory title,
+        string memory description,
+        uint256 reward,
+        bool isActive,
+        bool isCompleted,
+        address completer,
+        uint256 createdAt,
+        uint256 completedAt
+    ) {
+        Quest memory quest = quests[_questId];
+        return (
+            quest.id,
+            quest.creator,
+            quest.title,
+            quest.description,
+            quest.reward,
+            quest.isActive,
+            quest.isCompleted,
+            quest.completer,
+            quest.createdAt,
+            quest.completedAt
+        );
+    }
+
+    /**
+     * @dev Get user profile by address
+     */
+    function getUserProfile(address _user) external view returns (
+        uint256 reputation,
+        uint256 questsCreated,
+        uint256 questsCompleted,
+        uint256 totalRewardsEarned,
+        bool isVerified
+    ) {
+        UserProfile memory userProfile = userProfiles[_user];
+        return (
+            userProfile.reputation,
+            userProfile.questsCreated,
+            userProfile.questsCompleted,
+            userProfile.totalRewardsEarned,
+            userProfile.isVerified
+        );
+    }
+
+    /**
      * @dev Get platform statistics
      */
-    function getPlatformStats() external view returns (
-        uint256 _totalQuests,
-        uint256 _totalRewardsDistributed,
-        uint256 _totalUsers
-    ) {
-        return (totalQuests, totalRewardsDistributed, questCounter);
-    }
 
     /**
      * @dev Verify user (only owner)
@@ -187,5 +236,22 @@ contract SocialQuestNetwork is ERC721, Ownable, ReentrancyGuard {
      */
     function pauseQuest(uint256 _questId) external onlyOwner {
         quests[_questId].isActive = false;
+    }
+
+    /**
+     * @dev Get platform statistics
+     */
+    function getPlatformStats() external view returns (
+        uint256 totalQuestsCreated,
+        uint256 totalQuestsCompleted,
+        uint256 totalActiveUsers,
+        uint256 totalRewardsDistributed
+    ) {
+        return (
+            totalQuestsCreated,
+            totalQuestsCompleted,
+            totalActiveUsers,
+            totalRewardsDistributed
+        );
     }
 }

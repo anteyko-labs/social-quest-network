@@ -115,34 +115,48 @@ export default function Home() {
     functionName: 'completeQuest',
   })
 
-  // Load quests when quest IDs change
+  // Load quests when connected
   useEffect(() => {
-    if (questIds && questIds.length > 0) {
+    if (isConnected) {
       loadQuests()
     }
-  }, [questIds])
+  }, [isConnected])
 
   const loadQuests = async () => {
-    if (!questIds) return
-    
     setIsLoading(true)
     try {
-      const questPromises = questIds.map(async (questId: bigint) => {
-        // This would be a contract call to getQuest(questId)
-        // For demo purposes, we'll create mock data
-        return {
-          id: questId.toString(),
-          title: `Quest #${questId.toString()}`,
-          description: `Complete this amazing quest and earn rewards!`,
+      // For demo purposes, create some sample quests
+      const demoQuests = [
+        {
+          id: '1',
+          title: 'Welcome to Social Quest Network!',
+          description: 'Complete your first quest and earn 100 QRT tokens. This is a demo quest to showcase the platform.',
           reward: 100,
-          creator: '0x123...456',
+          creator: '0x1234567890123456789012345678901234567890',
           isActive: true,
-          createdAt: Date.now() - Math.random() * 86400000, // Random time in last 24h
+          createdAt: Date.now() - 3600000, // 1 hour ago
+        },
+        {
+          id: '2',
+          title: 'Connect Your Wallet',
+          description: 'Connect your MetaMask wallet to Status Network Sepolia and earn 50 QRT tokens.',
+          reward: 50,
+          creator: '0x0987654321098765432109876543210987654321',
+          isActive: true,
+          createdAt: Date.now() - 7200000, // 2 hours ago
+        },
+        {
+          id: '3',
+          title: 'Create Your First Quest',
+          description: 'Create a quest for other users to complete and earn 200 QRT tokens.',
+          reward: 200,
+          creator: '0x1111111111111111111111111111111111111111',
+          isActive: true,
+          createdAt: Date.now() - 10800000, // 3 hours ago
         }
-      })
+      ]
       
-      const quests = await Promise.all(questPromises)
-      setActiveQuests(quests)
+      setActiveQuests(demoQuests)
     } catch (error) {
       console.error('Error loading quests:', error)
     } finally {
@@ -152,12 +166,22 @@ export default function Home() {
 
   const handleCreateQuest = async (title: string, description: string, reward: number) => {
     try {
-      await createQuest({
-        args: [title, description, reward],
-      })
+      // For demo purposes, add quest to local state
+      const newQuest = {
+        id: Date.now().toString(),
+        title,
+        description,
+        reward,
+        creator: address || '0x0000000000000000000000000000000000000000',
+        isActive: true,
+        createdAt: Date.now(),
+      }
+      
+      setActiveQuests(prev => [newQuest, ...prev])
       setShowCreateModal(false)
-      // Refresh quests
-      setTimeout(loadQuests, 2000)
+      
+      // Show success message
+      alert(`Quest "${title}" created successfully! (Demo mode - contracts not deployed)`)
     } catch (error) {
       console.error('Error creating quest:', error)
     }
@@ -165,11 +189,11 @@ export default function Home() {
 
   const handleCompleteQuest = async (questId: string) => {
     try {
-      await completeQuest({
-        args: [BigInt(questId)],
-      })
-      // Refresh quests
-      setTimeout(loadQuests, 2000)
+      // For demo purposes, remove quest from active list
+      setActiveQuests(prev => prev.filter(quest => quest.id !== questId))
+      
+      // Show success message
+      alert(`Quest completed successfully! You earned QRT tokens! (Demo mode - contracts not deployed)`)
     } catch (error) {
       console.error('Error completing quest:', error)
     }

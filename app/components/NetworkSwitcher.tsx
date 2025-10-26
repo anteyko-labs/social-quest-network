@@ -1,10 +1,11 @@
 'use client'
 
-import { useAccount } from 'wagmi'
+import { useAccount, useChainId } from 'wagmi'
 import { Button } from './ui/Button'
 
 export function NetworkSwitcher() {
-  const { chain } = useAccount()
+  const { isConnected } = useAccount()
+  const chainId = useChainId()
 
   const statusSepolia = {
     id: 1660990954,
@@ -70,11 +71,11 @@ export function NetworkSwitcher() {
     }
   }
 
-  if (!chain) {
+  if (!isConnected) {
     return null
   }
 
-  if (chain.id === 1660990954) {
+  if (chainId === 1660990954) {
     return (
       <div className="flex items-center space-x-2 text-green-600">
         <div className="w-2 h-2 bg-green-500 rounded-full"></div>

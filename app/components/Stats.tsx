@@ -40,10 +40,10 @@ export function Stats({ refreshTrigger }: StatsProps) {
   }, [refreshTrigger, refetch])
 
   // Use contract data or fallback to default values
-  const totalQuestsCreated = statsData ? Number(statsData[0]) : 0
-  const totalQuestsCompleted = statsData ? Number(statsData[1]) : 0
-  const totalActiveUsers = statsData ? Number(statsData[2]) : 0
-  const totalRewardsDistributed = statsData ? Number(statsData[3]) : 0
+  const totalQuestsCreated = statsData ? Number((statsData as any)[0]) : 0
+  const totalQuestsCompleted = statsData ? Number((statsData as any)[1]) : 0
+  const totalActiveUsers = statsData ? Number((statsData as any)[2]) : 0
+  const totalRewardsDistributed = statsData ? Number((statsData as any)[3]) : 0
 
   const stats = [
     {

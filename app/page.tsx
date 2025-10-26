@@ -1,7 +1,7 @@
 'use client'
 
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { useAccount, useContract, useContractRead, useContractWrite } from 'wagmi'
+import { useAccount, useContractRead, useContractWrite } from 'wagmi'
 import { createPublicClient, http, parseAbiItem } from 'viem'
 import { useState, useEffect } from 'react'
 import { QuestCard } from './components/QuestCard'
@@ -196,16 +196,16 @@ export default function Home() {
       
       if (result) {
         return {
-          id: result[0].toString(),
-          title: result[2], // title
-          description: result[3], // description
-          reward: Number(result[4]), // reward
-          creator: result[1], // creator
-          isActive: result[5], // isActive
-          isCompleted: result[6], // isCompleted
-          completer: result[7], // completer
-          createdAt: Number(result[8]) * 1000, // createdAt (convert to milliseconds)
-          completedAt: Number(result[9]) * 1000, // completedAt (convert to milliseconds)
+          id: (result as any)[0].toString(),
+          title: (result as any)[2], // title
+          description: (result as any)[3], // description
+          reward: Number((result as any)[4]), // reward
+          creator: (result as any)[1], // creator
+          isActive: (result as any)[5], // isActive
+          isCompleted: (result as any)[6], // isCompleted
+          completer: (result as any)[7], // completer
+          createdAt: Number((result as any)[8]) * 1000, // createdAt (convert to milliseconds)
+          completedAt: Number((result as any)[9]) * 1000, // completedAt (convert to milliseconds)
         }
       }
       
@@ -256,53 +256,19 @@ export default function Home() {
   const loadQuests = async () => {
     setIsLoading(true)
     try {
-      // Check if contracts are deployed
-      if (SOCIAL_QUEST_ADDRESS === '0x0000000000000000000000000000000000000000') {
-        console.log('Contracts not deployed, using demo data')
-        const demoQuests = [
-          {
-            id: '1',
-            title: 'Welcome to Social Quest Network!',
-            description: 'Complete your first quest and earn 100 QRT tokens. This is a demo quest to showcase the platform.',
-            reward: 100,
-            creator: '0x1234567890123456789012345678901234567890',
-            isActive: true,
-            createdAt: Date.now() - 3600000, // 1 hour ago
-          },
-          {
-            id: '2',
-            title: 'Connect Your Wallet',
-            description: 'Connect your MetaMask wallet to Status Network Sepolia and earn 50 QRT tokens.',
-            reward: 50,
-            creator: '0x0987654321098765432109876543210987654321',
-            isActive: true,
-            createdAt: Date.now() - 7200000, // 2 hours ago
-          },
-          {
-            id: '3',
-            title: 'Create Your First Quest',
-            description: 'Create a quest for other users to complete and earn 200 QRT tokens.',
-            reward: 200,
-            creator: '0x1111111111111111111111111111111111111111',
-            isActive: true,
-            createdAt: Date.now() - 10800000, // 3 hours ago
-          }
-        ]
-        setActiveQuests(demoQuests)
-        return
-      }
+      // Load quests from deployed contracts
 
       // Refetch quest IDs from contract
       console.log('Refreshing quests from deployed contracts...')
       const { data: freshQuestIds } = await refetchQuests()
       console.log('Fresh questIds from contract:', freshQuestIds)
       
-      if (freshQuestIds && freshQuestIds.length > 0) {
-        console.log(`Found ${freshQuestIds.length} quests in contract`)
+      if (freshQuestIds && (freshQuestIds as any).length > 0) {
+        console.log(`Found ${(freshQuestIds as any).length} quests in contract`)
         // Get quest details for each quest ID
         const quests = []
-        for (let i = 0; i < freshQuestIds.length; i++) {
-          const questId = freshQuestIds[i]
+        for (let i = 0; i < (freshQuestIds as any).length; i++) {
+          const questId = (freshQuestIds as any)[i]
           const questDetails = await getQuestDetailsFromContract(questId.toString())
           if (questDetails) {
             quests.push(questDetails)
@@ -338,25 +304,7 @@ export default function Home() {
 
   const handleCreateQuest = async (title: string, description: string, reward: number) => {
     try {
-      // Check if contracts are deployed
-      if (SOCIAL_QUEST_ADDRESS === '0x0000000000000000000000000000000000000000') {
-        // Demo mode
-        const newQuest = {
-          id: Date.now().toString(),
-          title,
-          description,
-          reward,
-          creator: address || '0x0000000000000000000000000000000000000000',
-          isActive: true,
-          createdAt: Date.now(),
-        }
-        
-        setActiveQuests(prev => [newQuest, ...prev])
-        setShowCreateModal(false)
-        
-        alert(`Quest "${title}" created successfully! (Demo mode - contracts not deployed)`)
-        return
-      }
+      // Create quest using deployed contracts
 
       // Use real contract
       console.log('Creating quest with real contract...')
@@ -383,19 +331,13 @@ export default function Home() {
       }, 3000)
     } catch (error) {
       console.error('Error creating quest:', error)
-      alert(`Error creating quest: ${error.message}`)
+      alert(`Error creating quest: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
   const handleCompleteQuest = async (questId: string) => {
     try {
-      // Check if contracts are deployed
-      if (SOCIAL_QUEST_ADDRESS === '0x0000000000000000000000000000000000000000') {
-        // Demo mode
-        setActiveQuests(prev => prev.filter(quest => quest.id !== questId))
-        alert(`Quest completed successfully! You earned QRT tokens! (Demo mode - contracts not deployed)`)
-        return
-      }
+      // Complete quest using deployed contracts
 
       // Use real contract
       console.log('Completing quest with real contract...')
@@ -421,7 +363,7 @@ export default function Home() {
       }, 3000)
     } catch (error) {
       console.error('Error completing quest:', error)
-      alert(`Error completing quest: ${error.message}`)
+      alert(`Error completing quest: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 

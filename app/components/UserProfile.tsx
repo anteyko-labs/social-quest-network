@@ -46,13 +46,13 @@ export function UserProfile({ address, refreshTrigger }: UserProfileProps) {
 
   // Use contract data or fallback to mock data
   const profile = profileData ? {
-    reputation: Number(profileData[0]),
-    questsCreated: Number(profileData[1]),
-    questsCompleted: Number(profileData[2]),
-    totalRewardsEarned: Number(profileData[3]),
-    isVerified: profileData[4],
-    rank: Number(profileData[0]) >= 1000 ? 'Gold' : Number(profileData[0]) >= 500 ? 'Silver' : 'Bronze',
-    level: Math.floor(Number(profileData[0]) / 200) + 1
+    reputation: Number((profileData as any)[0]),
+    questsCreated: Number((profileData as any)[1]),
+    questsCompleted: Number((profileData as any)[2]),
+    totalRewardsEarned: Number((profileData as any)[3]),
+    isVerified: (profileData as any)[4],
+    rank: Number((profileData as any)[0]) >= 1000 ? 'Gold' : Number((profileData as any)[0]) >= 500 ? 'Silver' : 'Bronze',
+    level: Math.floor(Number((profileData as any)[0]) / 200) + 1
   } : {
     reputation: 0,
     questsCreated: 0,

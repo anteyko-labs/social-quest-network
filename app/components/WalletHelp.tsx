@@ -10,10 +10,10 @@ export function WalletHelp() {
         <AlertCircle className="w-6 h-6 text-blue-600 mt-0.5" />
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-blue-900 mb-2">
-            Не можете подключить кошелек?
+            Can't connect your wallet?
           </h3>
           <p className="text-blue-700 mb-4">
-            Следуйте этим простым шагам для подключения к Status Network:
+            Follow these simple steps to connect to Status Network:
           </p>
           
           <div className="space-y-3">
@@ -22,9 +22,9 @@ export function WalletHelp() {
                 1
               </div>
               <div>
-                <p className="font-medium text-blue-900">Получите тестовый ETH</p>
+                <p className="font-medium text-blue-900">Get test ETH</p>
                 <p className="text-sm text-blue-700">
-                  Перейдите на{' '}
+                  Go to{' '}
                   <a 
                     href="https://www.alchemy.com/faucets/ethereum-sepolia" 
                     target="_blank" 
@@ -33,7 +33,7 @@ export function WalletHelp() {
                   >
                     Alchemy Sepolia Faucet <ExternalLink className="w-3 h-3 ml-1" />
                   </a>
-                  {' '}и получите тестовый ETH
+                  {' '}and get test ETH
                 </p>
               </div>
             </div>
@@ -43,9 +43,9 @@ export function WalletHelp() {
                 2
               </div>
               <div>
-                <p className="font-medium text-blue-900">Добавьте Status Network</p>
+                <p className="font-medium text-blue-900">Add Status Network</p>
                 <p className="text-sm text-blue-700">
-                  При подключении кошелька нажмите "Approve" для добавления сети
+                  When connecting your wallet, click "Approve" to add the network
                 </p>
               </div>
             </div>
@@ -55,10 +55,10 @@ export function WalletHelp() {
                 3
               </div>
               <div>
-                <p className="font-medium text-blue-900">Наслаждайтесь безгазовыми транзакциями!</p>
+                <p className="font-medium text-blue-900">Enjoy gasless transactions!</p>
                 <p className="text-sm text-blue-700 flex items-center">
                   <Zap className="w-4 h-4 mr-1 text-green-500" />
-                  Все взаимодействия полностью бесплатны
+                  All interactions are completely free
                 </p>
               </div>
             </div>
@@ -67,9 +67,9 @@ export function WalletHelp() {
           <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-sm text-green-800">
               <strong>
-                <ClientOnly fallback="💡">💡</ClientOnly> Совет:
-              </strong> Status Network Sepolia - это тестовая сеть с полностью безгазовыми транзакциями. 
-              Никаких комиссий за газ не требуется!
+                💡 Tip:
+              </strong> Status Network Sepolia is a testnet with completely gasless transactions. 
+              No gas fees required!
             </p>
           </div>
         </div>

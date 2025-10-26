@@ -32,7 +32,7 @@ const statusSepolia = {
     },
   },
   testnet: true,
-  // Добавляем дополнительные параметры для лучшей совместимости
+  // Add additional parameters for better compatibility
   chainId: 1660990954,
   shortName: 'status-sepolia',
 }

@@ -59,7 +59,11 @@ const config = createConfig({
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiConfig config={config}>
-      <RainbowKitProvider chains={chains} modalSize="compact">
+      <RainbowKitProvider 
+        chains={chains} 
+        modalSize="compact"
+        locale="en"
+      >
         {children}
       </RainbowKitProvider>
     </WagmiConfig>
